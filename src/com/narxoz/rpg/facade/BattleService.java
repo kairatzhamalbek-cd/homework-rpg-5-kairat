@@ -4,6 +4,7 @@ import com.narxoz.rpg.decorator.AttackAction;
 import com.narxoz.rpg.enemy.BossEnemy;
 import com.narxoz.rpg.hero.HeroProfile;
 
+
 import java.util.Random;
 
 public class BattleService {
@@ -15,23 +16,41 @@ public class BattleService {
     }
 
     public AdventureResult battle(HeroProfile hero, BossEnemy boss, AttackAction action) {
-        // TODO: Implement the battle flow.
-        // Questions to answer:
-        // - Who attacks first?
-        // - How many rounds are allowed?
-        // - How is damage resolved?
-        // - How will randomness affect the result, if at all?
-        AdventureResult result = new AdventureResult();
-        result.setWinner("TODO");
-        result.setRounds(0);
-        result.setReward("TODO");
-        result.addLine("TODO: implement battle logic");
 
-        // Keep the field in use so students can decide whether to rely on it.
-        if (random.nextInt(1) == 0) {
-            // TODO: Replace placeholder branch with real deterministic or random logic.
+        AdventureResult result = new AdventureResult();
+        int rounds = 0;
+        int maxRounds = 5;
+
+        while (hero.isAlive() && boss.isAlive() && rounds < maxRounds) {
+            rounds++;
+            int heroDamage = action.getDamage();
+            boss.takeDamage(heroDamage);
+            result.addLine(hero.getName() + " attacks with " + action.getActionName() +
+                    " for " + heroDamage + " damage.");
+
+            if (!boss.isAlive()) {
+                break;
+            }
+            int bossDamage = boss.getAttackPower();
+            hero.takeDamage(bossDamage);
+            result.addLine(boss.getName() + " counterattacks for " + bossDamage + " damage.");
+        }
+        result.setRounds(rounds);
+
+        if (hero.isAlive() && !boss.isAlive()) {
+            result.setWinner(hero.getName());
+            result.setReward("Victory reward");
+        } else if (!hero.isAlive() && boss.isAlive()) {
+            result.setWinner(boss.getName());
+            result.setReward("No reward");
+        } else {
+            result.setWinner("Draw");
+            result.setReward("No reward");
         }
 
         return result;
+
+
+
     }
 }
